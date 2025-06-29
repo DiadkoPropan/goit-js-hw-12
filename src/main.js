@@ -8,6 +8,10 @@ import {
   hideLoadMoreButton,
 } from './js/render-functions';
 
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
+
+
 const form = document.querySelector('.form');
 const MoreBtn = document.querySelector('.MoreBtn');
 
@@ -17,15 +21,30 @@ let perPage = 15;
 
 // Обробка події надсилання форми
 form.addEventListener('submit', async event => {
-  event.preventDefault(); // Забороняємо перезавантаження сторінки
+  event.preventDefault();
+  query = event.target.elements['search-text'].value.trim();
+  
+  if (query === '') {
+    iziToast.warning({
+      title: 'Warning',
+      message: 'Please enter a search term.',
+      position: 'topRight',
+      backgroundColor: "#ffa000",
+      messageColor: "#fff",
+      timeout: 3000,
+      progressBar: false,
+      close: true,
+      transitionIn: 'fadeInDown',
+      transitionOut: 'fadeOutUp',
+    });
+    return;
+  }
 
-  query = event.target.elements['search-text'].value.trim(); // Отримуємо текст пошуку
-  if (query === '') return; // Якщо поле порожнє — нічого не робимо
-
-  page = 1; // Скидаємо сторінку на початок (новий пошук)
-
-  await fetchImages(query, page); // Робимо запит
+  hideLoadMoreButton(); 
+  page = 1;
+  await fetchImages(query, page);
 });
+
 
 // Обробка кнопки "Завантажити ще"
 MoreBtn.addEventListener("click", async () => {
